@@ -1,34 +1,32 @@
 const express = require("express");
 
-// 📦 Database
-const Database = require("./database/Database");
+// Database
+const Database = require("./database/DatabaseSQL");
 
-// 📦 Repositories
-const EntregasRepository = require("./repositories/EntregasRepositories");
-const MotoristasRepository = require("./repositories/MotoristaRepositores");
+// Repositories
+const EntregasRepository = require("./repositories/EntregasRepositoriesSQL");
+const MotoristasRepository = require("./repositories/MotoristaRepositoresSQL");
 
-// 🧠 Services
+// Services
 const EntregasService = require("./services/EntregasServices");
 const MotoristasService = require("./services/MotoristaServices");
 
-// 🎮 Controllers
+// Controllers
 const EntregasController = require("./controllers/EntregasControllers");
 const MotoristasController = require("./controllers/MotoristaControllers");
 
-// 🌐 Routes
+// Routes
 const entregasRoutes = require("./routers/EntregasRouters");
 const motoristasRoutes = require("./routers/MotoristaRouters");
 
 const server = express();
 server.use(express.json());
 
-/*
-🔥 INJEÇÃO DE DEPENDÊNCIA
-Aqui é onde tudo é montado (MUUUUITO IMPORTANTE)
-*/
+//INJEÇÃO DE DEPENDÊNCIA
+
 
 // Banco (compartilhado)
-const database = new Database();
+const database = Database;
 
 // Repositories
 const entregasRepository = new EntregasRepository(database);
@@ -37,7 +35,7 @@ const motoristasRepository = new MotoristasRepository(database);
 // Services
 const entregasService = new EntregasService(
   entregasRepository,
-  motoristasRepository // 👈 integração acontece aqui
+  motoristasRepository // integração acontece aqui
 );
 
 const motoristasService = new MotoristasService(

@@ -4,46 +4,50 @@ class MotoristasController {
     this.entregasService = entregasService;
   }
 
-  criar = (req, res) => {
+  criar = async (req, res) => {
     try {
-      const motorista = this.service.criarMotorista(req.body);
+      const motorista = await this.service.criarMotorista(req.body);
       res.status(201).json(motorista);
     } catch (e) {
       res.status(e.status || 400).json({ erro: e.message });
     }
   };
 
-  listar = (req, res) => {
-    const { status } = req.query;
-
-    const motoristas = this.service.listar(status);
-
-    res.json(motoristas);
+  listar = async (req, res) => {
+    try {
+      const { status } = req.query;
+      const motoristas = await this.service.listar(status);
+      res.json(motoristas);
+    } catch (e) {
+      res.status(500).json({ erro: e.message });
+    }
   };
 
-  buscar = (req, res) => {
+  buscar = async (req, res) => {
     try {
-      const motorista = this.service.buscarPorId(Number(req.params.id));
+      const motorista = await this.service.buscarPorId(Number(req.params.id));
       res.json(motorista);
     } catch (e) {
       res.status(404).json({ erro: e.message });
     }
   };
 
-  entregas = (req, res) => {
-    const { status } = req.query;
-
-    const entregas = this.entregasService.buscarPorMotorista(
-      Number(req.params.id),
-      status
-    );
-
-    res.json(entregas);
+  entregas = async (req, res) => {
+    try {
+      const { status } = req.query;
+      const entregas = await this.entregasService.buscarPorMotorista(
+        Number(req.params.id),
+        status
+      );
+      res.json(entregas);
+    } catch (e) {
+      res.status(500).json({ erro: e.message });
+    }
   };
 
-  alternarStatus = (req, res) => {
+  alternarStatus = async (req, res) => {
     try {
-      const motorista = this.service.alternarStatus(Number(req.params.id));
+      const motorista = await this.service.alternarStatus(Number(req.params.id));
       res.json(motorista);
     } catch (e) {
       res.status(404).json({ erro: e.message });

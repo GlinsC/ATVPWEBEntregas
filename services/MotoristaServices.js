@@ -5,9 +5,9 @@ class MotoristasService {
     this.motoristasRepository = motoristasRepository;
   }
 
-  criarMotorista({ nome, cpf, placaVeiculo }) {
-    // 🔴 Regra: CPF único
-    const existente = this.motoristasRepository.buscarPorCPF(cpf);
+  async criarMotorista({ nome, cpf, placaVeiculo }) {
+    // Regra: CPF único
+    const existente = await this.motoristasRepository.buscarPorCPF(cpf);
 
     if (existente) {
       const erro = new Error("CPF já cadastrado");
@@ -15,7 +15,7 @@ class MotoristasService {
       throw erro;
     }
 
-    return this.motoristasRepository.criar({
+    return await this.motoristasRepository.criar({
       nome,
       cpf,
       placaVeiculo,
@@ -23,8 +23,8 @@ class MotoristasService {
     });
   }
 
-  listar(status) {
-    const motoristas = this.motoristasRepository.listarTodos();
+  async listar(status) {
+    const motoristas = await this.motoristasRepository.listarTodos();
 
     // Se vier filtro de status, aplica
     if (status) {
@@ -34,8 +34,8 @@ class MotoristasService {
     return motoristas;
   }
 
-  buscarPorId(id) {
-    const motorista = this.motoristasRepository.buscarPorId(id);
+  async buscarPorId(id) {
+    const motorista = await this.motoristasRepository.buscarPorId(id);
 
     if (!motorista) {
       throw new Error("Motorista não encontrado");
@@ -44,13 +44,13 @@ class MotoristasService {
     return motorista;
   }
 
-  alternarStatus(id) {
-    const motorista = this.buscarPorId(id);
+  async alternarStatus(id) {
+    const motorista = await this.buscarPorId(id);
 
     // Alterna o status: se ATIVO -> INATIVO, se INATIVO -> ATIVO
     motorista.status = motorista.status === "ATIVO" ? "INATIVO" : "ATIVO";
 
-    return this.motoristasRepository.atualizar(id, motorista);
+    return await this.motoristasRepository.atualizar(id, motorista);
   }
 }
 

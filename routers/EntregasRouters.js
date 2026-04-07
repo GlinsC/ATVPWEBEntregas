@@ -14,22 +14,7 @@ function entregasRoutes(controller) {
   router.patch("/entregas/:id/avancar", controller.avancar);
   router.patch("/entregas/:id/cancelar", controller.cancelar);
 
-  router.get("/entregas/:id/historico", controller.historico);
-
-  router.patch("/entregas/:id/atribuir", (req, res) => {
-    try {
-      const { motoristaId } = req.body;
-
-      const entrega = controller.service.atribuirMotorista(
-        Number(req.params.id),
-        motoristaId
-      );
-
-      res.json(entrega);
-    } catch (e) {
-      res.status(e.status || 400).json({ erro: e.message });
-    }
-  });
+  router.patch("/entregas/:id/atribuir", controller.atribuir);
 
   return router;
 }
