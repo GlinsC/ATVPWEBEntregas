@@ -8,6 +8,5 @@ module.exports = (controller) => {
     router.get("/motoristas/:id", controller.buscar);
     router.get("/motoristas/:id/entregas", controller.entregas);
     router.patch("/motoristas/:id/status", controller.alternarStatus);
-
     return router;
 };

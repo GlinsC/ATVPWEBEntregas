@@ -51,7 +51,12 @@ class EntregasRepositorySQL {
 
       db.run(sql, valores, function (err) {
         if (err) reject(err);
-        else resolve({ id: this.lastID, ...dados });
+        else {
+          db.get("SELECT last_insert_rowid() as id", [], (err2, row) => {
+            if (err2) reject(err2);
+            else resolve({ ...dados, id: row.id });
+          });
+        }
       });
     });
   }
@@ -95,6 +100,63 @@ class EntregasRepositorySQL {
       });
     });
   }
+
+  // Histórico de eventos
+  criarEvento(entregaId, descricao) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        INSERT INTO eventos_entrega (entregaId, data, descricao)
+        VALUES (?, ?, ?)
+      `;
+
+      const valores = [entregaId, new Date().toISOString(), descricao];
+
+      db.run(sql, valores, function (err) {
+        if (err) reject(err);
+        else resolve({ id: this.lastID, entregaId, data: valores[1], descricao });
+      });
+    });
+  }
+
+  listarHistorico(entregaId) {
+    return new Promise((resolve, reject) => {
+      const sql = `
+        SELECT id, entregaId, data, descricao
+        FROM eventos_entrega
+        WHERE entregaId = ?
+        ORDER BY data ASC
+      `;
+
+      db.all(sql, [entregaId], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  }
+
+  relatorioPorStatus() {
+    return new Promise((resolve, reject) => {
+      const sql = `
+      SELECT status, COUNT(*) as total
+      FROM entregas
+      GROUP BY status
+    `;
+
+      db.all(sql, [], (err, rows) => {
+        if (err) reject(err);
+        else {
+          const resultado = {};
+
+          rows.forEach(r => {
+            resultado[r.status] = r.total;
+          });
+
+          resolve(resultado);
+        }
+      });
+    });
+  }
+
 }
 
 module.exports = EntregasRepositorySQL;

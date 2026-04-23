@@ -25,8 +25,6 @@ class EntregasService {
       throw new Error("Entrega duplicada ativa");
     }
 
-    const now = new Date().toISOString();
-
     const novaEntrega = {
       id: null,
       descricao,
@@ -37,17 +35,35 @@ class EntregasService {
     };
 
     const entregaCriada = await this.entregasRepository.criar(novaEntrega);
-    return entregaCriada;
+    await this.entregasRepository.criarEvento(entregaCriada.id, "Entrega criada");
+
+    return {
+      ...entregaCriada,
+      historico: [
+        {
+          entregaId: entregaCriada.id,
+          data: new Date().toISOString(),
+          descricao: "Entrega criada"
+        }
+      ]
+    };
   }
 
-  async listarEntregas(status) {
+  async listarEntregas(status, incluirHistorico = false) {
     const entregas = await this.entregasRepository.listarTodos();
 
-    if (status) {
-      return entregas.filter(e => e.status === status);
+    const filtradas = status ? entregas.filter(e => e.status === status) : entregas;
+
+    if (!incluirHistorico) {
+      return filtradas;
     }
 
-    return entregas;
+    const promessas = filtradas.map(async entrega => {
+      const historico = await this.entregasRepository.listarHistorico(entrega.id);
+      return { ...entrega, historico };
+    });
+
+    return await Promise.all(promessas);
   }
 
   async buscarPorId(id) {
@@ -57,11 +73,14 @@ class EntregasService {
       throw new Error("Entrega não encontrada");
     }
 
-    return entrega;
+    const historico = await this.entregasRepository.listarHistorico(id);
+    return { ...entrega, historico };
   }
 
   async avancarStatus(id) {
     const entrega = await this.buscarPorId(id);
+
+    const statusAnterior = entrega.status;
 
     if (entrega.status === STATUS.CRIADA) {
       entrega.status = STATUS.EM_TRANSITO;
@@ -71,7 +90,11 @@ class EntregasService {
       throw new Error("Não é possível avançar o status");
     }
 
-    return await this.entregasRepository.atualizar(id, entrega);
+    const entregaAtualizada = await this.entregasRepository.atualizar(id, entrega);
+    await this.entregasRepository.criarEvento(id, `Status alterado de ${statusAnterior} para ${entregaAtualizada.status}`);
+
+    const historico = await this.entregasRepository.listarHistorico(id);
+    return { ...entregaAtualizada, historico };
   }
 
   async cancelarEntrega(id) {
@@ -83,7 +106,11 @@ class EntregasService {
 
     entrega.status = STATUS.CANCELADA;
 
-    return await this.entregasRepository.atualizar(id, entrega);
+    const entregaAtualizada = await this.entregasRepository.atualizar(id, entrega);
+    await this.entregasRepository.criarEvento(id, "Entrega cancelada");
+
+    const historico = await this.entregasRepository.listarHistorico(id);
+    return { ...entregaAtualizada, historico };
   }
 
   async atribuirMotorista(entregaId, motoristaId) {
@@ -107,7 +134,11 @@ class EntregasService {
 
     entrega.motoristaId = motoristaId;
 
-    return await this.entregasRepository.atualizar(entregaId, entrega);
+    const entregaAtualizada = await this.entregasRepository.atualizar(entregaId, entrega);
+    await this.entregasRepository.criarEvento(entregaId, `Motorista atribuído: ${motorista.nome} (id ${motoristaId})`);
+
+    const historico = await this.entregasRepository.listarHistorico(entregaId);
+    return { ...entregaAtualizada, historico };
   }
 
   async buscarPorMotorista(motoristaId, status) {
@@ -117,6 +148,46 @@ class EntregasService {
       return e.motoristaId === motoristaId &&
         (!status || e.status === status);
     });
+  }
+
+  async relatorioPorStatus() {
+    return await this.entregasRepository.relatorioPorStatus();
+  }
+
+  async relatorioMotoristasAtivos() {
+    const motoristas = await this.motoristasRepository.listarTodos();
+    const ativos = motoristas.filter(m => m.status === 'ATIVO');
+
+    const resultado = await Promise.all(ativos.map(async motorista => {
+      const entregas = await this.buscarPorMotorista(motorista.id);
+      const entregasEmAberto = entregas.filter(e => e.status !== STATUS.ENTREGUE && e.status !== STATUS.CANCELADA).length;
+      return {
+        motoristaId: motorista.id,
+        nome: motorista.nome,
+        entregasEmAberto
+      };
+    }));
+
+    return resultado;
+  }
+
+  async relatorioMotoristaAtivoDetalhado(motoristaId) {
+    const motorista = await this.motoristasRepository.buscarPorId(motoristaId);
+    
+    if (!motorista) {
+      throw new Error("Motorista não encontrado");
+    }
+
+    if (motorista.status !== 'ATIVO') {
+      throw new Error("Motorista não está ativo");
+    }
+
+    const entregas = await this.buscarPorMotorista(motoristaId);
+    
+    return {
+      motorista,
+      entregas
+    };
   }
 }
 

@@ -20,11 +20,20 @@ class EntregasController {
   };
 
   listar = async (req, res) => {
-    const { status } = req.query;
+    const { status, incluirHistorico } = req.query;
 
-    const entregas = await this.service.listarEntregas(status);
+    const entregas = await this.service.listarEntregas(status, incluirHistorico === "true");
 
     res.json(entregas);
+  };
+
+  buscarHistorico = async (req, res) => {
+    try {
+      const entrega = await this.service.buscarPorId(Number(req.params.id));
+      res.json(entrega.historico);
+    } catch (error) {
+      res.status(404).json({ erro: error.message });
+    }
   };
 
   buscarPorId = async (req, res) => {
@@ -65,6 +74,33 @@ class EntregasController {
 
     } catch (error) {
       res.status(error.status || 400).json({ erro: error.message });
+    }
+  };
+  relatorioStatus = async (req, res) => {
+    try {
+      const data = await this.service.relatorioPorStatus();
+      res.json(data);
+    } catch (e) {
+      res.status(400).json({ erro: e.message });
+    }
+  };
+
+  relatorioMotoristasAtivos = async (req, res) => {
+    try {
+      const data = await this.service.relatorioMotoristasAtivos();
+      res.json(data);
+    } catch (e) {
+      res.status(400).json({ erro: e.message });
+    }
+  };
+
+  relatorioMotoristaAtivoDetalhado = async (req, res) => {
+    try {
+      const motoristaId = Number(req.params.id);
+      const data = await this.service.relatorioMotoristaAtivoDetalhado(motoristaId);
+      res.json(data);
+    } catch (e) {
+      res.status(e.message === "Motorista não encontrado" ? 404 : 400).json({ erro: e.message });
     }
   };
 }

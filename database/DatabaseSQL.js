@@ -28,6 +28,15 @@ db.serialize(() => {
       FOREIGN KEY (motoristaId) REFERENCES motoristas(id)
     )
   `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS eventos_entrega (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      entregaId INTEGER NOT NULL,
+      data TEXT NOT NULL,
+      descricao TEXT NOT NULL,
+      FOREIGN KEY (entregaId) REFERENCES entregas(id) ON DELETE CASCADE
+  )`);
 });
 
 module.exports = db;

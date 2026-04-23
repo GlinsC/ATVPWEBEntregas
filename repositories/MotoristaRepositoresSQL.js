@@ -66,7 +66,12 @@ class MotoristasRepositorySQL {
 
       db.run(sql, valores, function (err) {
         if (err) reject(err);
-        else resolve({ id: this.lastID, ...dados });
+        else {
+          db.get("SELECT last_insert_rowid() as id", [], (err2, row) => {
+            if (err2) reject(err2);
+            else resolve({ ...dados, id: row.id });
+          });
+        }
       });
     });
   }
