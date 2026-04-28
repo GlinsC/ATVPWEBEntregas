@@ -20,11 +20,37 @@ class EntregasController {
   };
 
   listar = async (req, res) => {
-    const { status, incluirHistorico } = req.query;
+    try {
+      const { status, incluirHistorico, page, limit, createdDe, createdAte } = req.query;
 
-    const entregas = await this.service.listarEntregas(status, incluirHistorico === "true");
+      // Construir objeto de filtros
+      const filtros = {
+        status,
+        page: page || 1,
+        limit: limit || 10,
+        createdDe,
+        createdAte
+      };
 
-    res.json(entregas);
+      const resultado = await this.service.listarEntregas(filtros, incluirHistorico === "true");
+
+      // Se é resultado do Prisma (com paginação)
+      if (resultado.data && resultado.totalPages !== undefined) {
+        return res.json({
+          mensagem: "Entregas listadas com sucesso",
+          data: resultado.data,
+          total: resultado.total,
+          page: resultado.page,
+          limit: resultado.limit,
+          totalPages: resultado.totalPages
+        });
+      }
+
+      // Compatibilidade com resposta legada
+      res.json(resultado);
+    } catch (error) {
+      res.status(400).json({ erro: error.message });
+    }
   };
 
   buscarHistorico = async (req, res) => {

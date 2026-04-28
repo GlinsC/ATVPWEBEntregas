@@ -234,3 +234,6 @@ Exemplo:
   "nome": "João"
 }
 
+GET /api/entregas?page=1&limit=3
+GET /api/entregas?status=ENTREGUE&page=1&limit=2
+GET /api/entregas?createdDe=2026-04-01&createdAte=2026-04-27

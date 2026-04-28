@@ -11,7 +11,10 @@ class EntregasService {
       throw new Error("Origem e destino não podem ser iguais");
     }
 
-    const entregas = await this.entregasRepository.listarTodos();
+    const resultado = await this.entregasRepository.listarTodos();
+    
+    // Prisma retorna { data: [...] }, extrair o array
+    const entregas = resultado.data || resultado;
 
     const existeDuplicada = entregas.find(e =>
       e.descricao === descricao &&
@@ -49,21 +52,12 @@ class EntregasService {
     };
   }
 
-  async listarEntregas(status, incluirHistorico = false) {
-    const entregas = await this.entregasRepository.listarTodos();
-
-    const filtradas = status ? entregas.filter(e => e.status === status) : entregas;
-
-    if (!incluirHistorico) {
-      return filtradas;
-    }
-
-    const promessas = filtradas.map(async entrega => {
-      const historico = await this.entregasRepository.listarHistorico(entrega.id);
-      return { ...entrega, historico };
-    });
-
-    return await Promise.all(promessas);
+  async listarEntregas(filtros = {}, incluirHistorico = false) {
+    // Suporta tanto string (status) quanto objeto (filtros completos)
+    const filtrosObj = typeof filtros === 'string' ? { status: filtros } : filtros;
+    
+    // Passa para o repositório Prisma que já trata paginação, filtros e datas
+    return await this.entregasRepository.listarTodos(filtrosObj);
   }
 
   async buscarPorId(id) {
@@ -73,8 +67,8 @@ class EntregasService {
       throw new Error("Entrega não encontrada");
     }
 
-    const historico = await this.entregasRepository.listarHistorico(id);
-    return { ...entrega, historico };
+    // Prisma já retorna com eventos inclusos
+    return entrega;
   }
 
   async avancarStatus(id) {
@@ -93,8 +87,8 @@ class EntregasService {
     const entregaAtualizada = await this.entregasRepository.atualizar(id, entrega);
     await this.entregasRepository.criarEvento(id, `Status alterado de ${statusAnterior} para ${entregaAtualizada.status}`);
 
-    const historico = await this.entregasRepository.listarHistorico(id);
-    return { ...entregaAtualizada, historico };
+    // Buscar entrega atualizada com eventos inclusos
+    return await this.entregasRepository.buscarPorId(id);
   }
 
   async cancelarEntrega(id) {
@@ -109,8 +103,8 @@ class EntregasService {
     const entregaAtualizada = await this.entregasRepository.atualizar(id, entrega);
     await this.entregasRepository.criarEvento(id, "Entrega cancelada");
 
-    const historico = await this.entregasRepository.listarHistorico(id);
-    return { ...entregaAtualizada, historico };
+    // Buscar entrega atualizada com eventos inclusos
+    return await this.entregasRepository.buscarPorId(id);
   }
 
   async atribuirMotorista(entregaId, motoristaId) {
@@ -137,17 +131,24 @@ class EntregasService {
     const entregaAtualizada = await this.entregasRepository.atualizar(entregaId, entrega);
     await this.entregasRepository.criarEvento(entregaId, `Motorista atribuído: ${motorista.nome} (id ${motoristaId})`);
 
-    const historico = await this.entregasRepository.listarHistorico(entregaId);
-    return { ...entregaAtualizada, historico };
+    // Buscar entrega atualizada com eventos inclusos
+    return await this.entregasRepository.buscarPorId(entregaId);
   }
 
   async buscarPorMotorista(motoristaId, status) {
-    const entregas = await this.entregasRepository.listarTodos();
-
-    return entregas.filter(e => {
-      return e.motoristaId === motoristaId &&
-        (!status || e.status === status);
+    // Buscar todas as entregas com paginação
+    const resultado = await this.entregasRepository.listarTodos({ 
+      motoristaId,
+      status 
     });
+
+    // Se é resultado do Prisma com paginação, retorna como está
+    if (resultado.data) {
+      return resultado;
+    }
+
+    // Fallback para dados brutos
+    return resultado;
   }
 
   async relatorioPorStatus() {

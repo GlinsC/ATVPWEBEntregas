@@ -1,0 +1,25 @@
+CREATE TABLE IF NOT EXISTS motoristas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL,
+  cpf TEXT UNIQUE NOT NULL,
+  placaVeiculo TEXT NOT NULL,
+  status TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS entregas (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  descricao TEXT NOT NULL,
+  origem TEXT NOT NULL,
+  destino TEXT NOT NULL,
+  status TEXT NOT NULL,
+  motoristaId INTEGER,
+  FOREIGN KEY (motoristaId) REFERENCES motoristas(id)
+);
+
+CREATE TABLE IF NOT EXISTS eventos_entrega (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  entregaId INTEGER NOT NULL,
+  data TEXT NOT NULL,
+  descricao TEXT NOT NULL,
+  FOREIGN KEY (entregaId) REFERENCES entregas(id) ON DELETE CASCADE
+);

@@ -1,11 +1,8 @@
 const express = require("express");
 
-// Database
-const Database = require("./database/DatabaseSQL");
-
-// Repositories
-const EntregasRepository = require("./repositories/EntregasRepositoriesSQL");
-const MotoristasRepository = require("./repositories/MotoristaRepositoresSQL");
+// Repositórios com Prisma
+const EntregasRepositoryPrisma = require("./repositories/EntregasRepositoriesPrisma");
+const MotoristasRepositoryPrisma = require("./repositories/MotoristaRepositoresPrisma");
 
 // Services
 const EntregasService = require("./services/EntregasServices");
@@ -22,29 +19,20 @@ const motoristasRoutes = require("./routers/MotoristaRouters");
 const server = express();
 server.use(express.json());
 
-//INJEÇÃO DE DEPENDÊNCIA
-
-
-// Banco (compartilhado)
-const database = Database;
-
-// Repositories
-const entregasRepository = new EntregasRepository(database);
-const motoristasRepository = new MotoristasRepository(database);
+// INJEÇÃO DE DEPENDÊNCIA - Usando Prisma
+const entregasRepository = new EntregasRepositoryPrisma();
+const motoristasRepository = new MotoristasRepositoryPrisma();
 
 // Services
 const entregasService = new EntregasService(
   entregasRepository,
-  motoristasRepository // integração acontece aqui
-);
-
-const motoristasService = new MotoristasService(
   motoristasRepository
 );
 
+const motoristasService = new MotoristasService(motoristasRepository);
+
 // Controllers
 const entregasController = new EntregasController(entregasService);
-
 const motoristasController = new MotoristasController(
   motoristasService,
   entregasService
