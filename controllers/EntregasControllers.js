@@ -8,12 +8,8 @@ class EntregasController {
 
   criar = async (req, res) => {
     try {
-      // req.body vem da requisição HTTP
       const entrega = await this.service.criarEntrega(req.body);
-
-      // resposta HTTP
       res.status(201).json(entrega);
-
     } catch (error) {
       res.status(400).json({ erro: error.message });
     }
@@ -22,8 +18,6 @@ class EntregasController {
   listar = async (req, res) => {
     try {
       const { status, incluirHistorico, page, limit, createdDe, createdAte } = req.query;
-
-      // Construir objeto de filtros
       const filtros = {
         status,
         page: page || 1,
@@ -34,7 +28,6 @@ class EntregasController {
 
       const resultado = await this.service.listarEntregas(filtros, incluirHistorico === "true");
 
-      // Se é resultado do Prisma (com paginação)
       if (resultado.data && resultado.totalPages !== undefined) {
         return res.json({
           mensagem: "Entregas listadas com sucesso",
@@ -46,10 +39,19 @@ class EntregasController {
         });
       }
 
-      // Compatibilidade com resposta legada
       res.json(resultado);
     } catch (error) {
       res.status(400).json({ erro: error.message });
+    }
+  };
+
+  painelEntregas = async (req, res) => {
+    try {
+      const resultado = await this.service.listarEntregas({ page: 1, limit: 20 });
+      const entregas = resultado.data || resultado;
+      res.render("entregas", { entregas });
+    } catch (error) {
+      res.status(500).send("Erro ao carregar a página de entregas");
     }
   };
 

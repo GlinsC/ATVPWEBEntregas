@@ -14,9 +14,8 @@ const EntregasController = require("./controllers/EntregasControllers");
 const MotoristasController = require("./controllers/MotoristaControllers");
 
 // Routes
-const entregasRoutes = require("./routes/EntregasRoutes");
-const motoristasRoutes = require("./routes/MotoristaRoutes");
-const painelRoutes = require("./routes/PainelRoutes");
+const { entregasRoutes, painelEntregasRoutes } = require("./routes/EntregasRoutes");
+const { motoristasRoutes, painelMotoristaRoutes } = require("./routes/MotoristaRoutes");
 
 const server = express();
 server.use(express.json());
@@ -44,20 +43,10 @@ const motoristasController = new MotoristasController(
 );
 
 // Rotas
-server.get("/api/entregas", (req, res) => {
-  const userAgent = req.headers['user-agent'] || '';
-  const isBrowser = userAgent.includes('Mozilla') || userAgent.includes('Chrome') || userAgent.includes('Safari');
-
-  if (isBrowser) {
-    return res.redirect("/painel/entregas");
-  }
-  // Se não for navegador, continua para a API (não redireciona)
-  // A requisição continuará para as próximas rotas
-});
-
-server.use("/", painelRoutes(entregasService, motoristasService));
 server.use("/api", entregasRoutes(entregasController));
 server.use("/api", motoristasRoutes(motoristasController));
+server.use("/", painelEntregasRoutes(entregasController));
+server.use("/", painelMotoristaRoutes(motoristasController));
 
 server.get("/", (req, res) => {
   res.redirect("/painel/entregas");

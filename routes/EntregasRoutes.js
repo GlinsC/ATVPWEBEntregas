@@ -3,10 +3,8 @@ const express = require("express");
 // Recebe controller via injeção de dependência
 function entregasRoutes(controller) {
   const router = express.Router();
-  
 
   // Cada rota chama um método do controller
-
   router.post("/entregas", controller.criar);
   router.get("/entregas", controller.listar);
   router.get("/entregas/:id", controller.buscarPorId);
@@ -22,4 +20,13 @@ function entregasRoutes(controller) {
   return router;
 }
 
-module.exports = entregasRoutes;
+function painelEntregasRoutes(controller) {
+  const router = express.Router();
+  router.get("/painel/entregas", controller.painelEntregas);
+  return router;
+}
+
+module.exports = {
+  entregasRoutes,
+  painelEntregasRoutes
+};

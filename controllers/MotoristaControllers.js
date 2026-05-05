@@ -45,6 +45,17 @@ class MotoristasController {
     }
   };
 
+  painelMotorista = async (req, res) => {
+    try {
+      const motoristas = await this.service.listar();
+      const resultado = await this.entregasService.listarEntregas({ page: 1, limit: 50 });
+      const entregas = resultado.data || resultado;
+      res.render("motorista", { motoristas, entregas });
+    } catch (e) {
+      res.status(500).send("Erro ao carregar o painel do motorista");
+    }
+  };
+
   alternarStatus = async (req, res) => {
     try {
       const motorista = await this.service.alternarStatus(Number(req.params.id));
