@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Motoristas</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <div>
+        <h1>Painel de Motoristas</h1>
+        <p class="subtitle">Dados de motoristas e entregas distribuídas separadamente.</p>
+      </div>
+      <nav class="page-nav">
+        <a href="/painel/entregas">Entregas</a>
+        <a href="/painel/motorista">Motoristas</a>
+      </nav>
+    </header>
+
+    <section class="panel-section">
+      <h2>Motoristas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>CPF</th>
+            <th>Placa</th>
+            <th>Status</th>
+            <th>Entregas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (motoristas && motoristas.length > 0) { %>
+            <% motoristas.forEach(motorista => { %>
+              <tr>
+                <td><%= motorista.id %></td>
+                <td><%= motorista.nome %></td>
+                <td><%= motorista.cpf %></td>
+                <td><%= motorista.placaVeiculo %></td>
+                <td><%= motorista.status %></td>
+                <td><%= motorista.entregas ? motorista.entregas.length : 0 %></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="6">Nenhum motorista cadastrado.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel-section">
+      <h2>Entregas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Descrição</th>
+            <th>Status</th>
+            <th>Motorista</th>
+            <th>Origem</th>
+            <th>Destino</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (entregas && entregas.length > 0) { %>
+            <% entregas.forEach(entrega => { %>
+              <tr>
+                <td><%= entrega.id %></td>
+                <td><%= entrega.descricao %></td>
+                <td><%= entrega.status %></td>
+                <td><%= entrega.motorista ? entrega.motorista.nome : "Sem motorista" %></td>
+                <td><%= entrega.origem %></td>
+                <td><%= entrega.destino %></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="6">Nenhuma entrega encontrada.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>
