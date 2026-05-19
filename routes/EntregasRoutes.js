@@ -22,7 +22,16 @@ function entregasRoutes(controller) {
 
 function painelEntregasRoutes(controller) {
   const router = express.Router();
-  router.get("/painel/entregas", controller.painelEntregas);
+
+  router.get("/painel/entregas", controller.listar);
+  router.post("/painel/entregas", controller.criar);
+  router.get("/painel/entregas/:id", controller.buscarPorId);
+  router.post("/painel/entregas/:id/avancar", controller.avancar);
+  router.post("/painel/entregas/:id/cancelar", controller.cancelar);
+  router.post("/painel/entregas/:id/atribuir", controller.atribuir);
+  router.get("/painel/relatorios/entregas-por-status", controller.relatorioStatus);
+  router.get("/painel/relatorios/motoristas-ativos", controller.relatorioMotoristasAtivos);
+
   return router;
 }
 

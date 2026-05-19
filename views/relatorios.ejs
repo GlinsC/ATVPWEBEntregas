@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <div>
+        <h1><%= title %></h1>
+        <p class="subtitle">Relatórios gerados a partir dos dados de entregas.</p>
+      </div>
+      <nav class="page-nav">
+        <a href="/painel/entregas">Entregas</a>
+        <a href="/painel/motorista">Motoristas</a>
+      </nav>
+    </header>
+
+    <% if (statusReport) { %>
+      <section class="panel-section">
+        <h2>Status das entregas</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% statusReport.forEach(item => { %>
+              <tr>
+                <td><%= item.status %></td>
+                <td><%= item.total %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </section>
+    <% } %>
+
+    <% if (activeMotoristas) { %>
+      <section class="panel-section">
+        <h2>Motoristas ativos</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Entregas em aberto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% activeMotoristas.forEach(item => { %>
+              <tr>
+                <td><%= item.motoristaId %></td>
+                <td><%= item.nome %></td>
+                <td><%= item.entregasEmAberto %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </section>
+    <% } %>
+  </div>
+</body>
+</html>

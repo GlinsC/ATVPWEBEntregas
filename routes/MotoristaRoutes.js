@@ -14,7 +14,12 @@ function motoristasRoutes(controller) {
 
 function painelMotoristaRoutes(controller) {
   const router = express.Router();
-  router.get("/painel/motorista", controller.painelMotorista);
+
+  router.get("/painel/motorista", controller.listar);
+  router.post("/painel/motorista", controller.criar);
+  router.get("/painel/motorista/:id", controller.buscar);
+  router.post("/painel/motorista/:id/status", controller.alternarStatus);
+
   return router;
 }
 

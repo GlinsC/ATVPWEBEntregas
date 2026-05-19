@@ -11,13 +11,57 @@
     <header class="page-header">
       <div>
         <h1>Painel de Entregas</h1>
-        <p class="subtitle">Veja as entregas atuais organizadas em tabela.</p>
+        <p class="subtitle">Filtre por status, crie entregas e veja o histórico de ações.</p>
       </div>
       <nav class="page-nav">
         <a href="/painel/entregas">Entregas</a>
         <a href="/painel/motorista">Motoristas</a>
       </nav>
     </header>
+
+    <% if (errorMessage) { %>
+      <div class="alert alert-error"><%= errorMessage %></div>
+    <% } %>
+    <% if (successMessage) { %>
+      <div class="alert alert-success"><%= successMessage %></div>
+    <% } %>
+
+    <section class="panel-section form-section">
+      <div class="form-card">
+        <h2>Filtrar entregas</h2>
+        <form method="GET" action="/painel/entregas" class="form-grid">
+          <label>
+            Status
+            <select name="status">
+              <option value="">Todos</option>
+              <% statusOptions.forEach(option => { %>
+                <option value="<%= option %>" <%= selectedStatus === option ? 'selected' : '' %>><%= option %></option>
+              <% }) %>
+            </select>
+          </label>
+          <button class="button" type="submit">Filtrar</button>
+        </form>
+      </div>
+
+      <div class="form-card">
+        <h2>Criar nova entrega</h2>
+        <form method="POST" action="/painel/entregas" class="form-grid">
+          <label>
+            Descrição
+            <input type="text" name="descricao" value="<%= formData.descricao || '' %>" required />
+          </label>
+          <label>
+            Origem
+            <input type="text" name="origem" value="<%= formData.origem || '' %>" required />
+          </label>
+          <label>
+            Destino
+            <input type="text" name="destino" value="<%= formData.destino || '' %>" required />
+          </label>
+          <button class="button button-primary" type="submit">Criar entrega</button>
+        </form>
+      </div>
+    </section>
 
     <table>
       <thead>
@@ -29,6 +73,7 @@
           <th>Status</th>
           <th>Motorista</th>
           <th>Última Movimentação</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -49,11 +94,14 @@
                   -
                 <% } %>
               </td>
+              <td>
+                <a class="button button-small" href="/painel/entregas/<%= entrega.id %>">Detalhes</a>
+              </td>
             </tr>
           <% }) %>
         <% } else { %>
           <tr>
-            <td colspan="7">Nenhuma entrega encontrada.</td>
+            <td colspan="8">Nenhuma entrega encontrada.</td>
           </tr>
         <% } %>
       </tbody>

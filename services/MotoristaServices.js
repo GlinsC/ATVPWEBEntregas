@@ -23,15 +23,9 @@ class MotoristasService {
     });
   }
 
-  async listar(status) {
-    const motoristas = await this.motoristasRepository.listarTodos();
-
-    // Se vier filtro de status, aplica
-    if (status) {
-      return motoristas.filter(m => m.status === status);
-    }
-
-    return motoristas;
+  async listar(statusOrFiltros) {
+    const filtros = typeof statusOrFiltros === "object" ? statusOrFiltros : { status: statusOrFiltros };
+    return await this.motoristasRepository.listarTodos(filtros);
   }
 
   async buscarPorId(id) {

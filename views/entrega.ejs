@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrega <%= entrega.id %></title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <div>
+        <h1>Entrega #<%= entrega.id %></h1>
+        <p class="subtitle">Detalhes da entrega e ações disponíveis.</p>
+      </div>
+      <nav class="page-nav">
+        <a href="/painel/entregas">Entregas</a>
+        <a href="/painel/motorista">Motoristas</a>
+      </nav>
+    </header>
+
+    <% if (errorMessage) { %>
+      <div class="alert alert-error"><%= errorMessage %></div>
+    <% } %>
+    <% if (successMessage) { %>
+      <div class="alert alert-success"><%= successMessage %></div>
+    <% } %>
+
+    <section class="panel-section">
+      <h2>Informações da entrega</h2>
+      <table>
+        <tbody>
+          <tr><th>ID</th><td><%= entrega.id %></td></tr>
+          <tr><th>Descrição</th><td><%= entrega.descricao %></td></tr>
+          <tr><th>Origem</th><td><%= entrega.origem %></td></tr>
+          <tr><th>Destino</th><td><%= entrega.destino %></td></tr>
+          <tr><th>Status</th><td><%= entrega.status %></td></tr>
+          <tr><th>Motorista</th><td><%= entrega.motorista ? entrega.motorista.nome : "Sem motorista" %></td></tr>
+          <tr><th>Último evento</th><td>
+            <% if (entrega.eventos && entrega.eventos.length > 0) { %>
+              <%= entrega.eventos[entrega.eventos.length - 1].descricao %>
+            <% } else { %>
+              -
+            <% } %>
+          </td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel-section">
+      <h2>Histórico de eventos</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (entrega.eventos && entrega.eventos.length > 0) { %>
+            <% entrega.eventos.forEach(evento => { %>
+              <tr>
+                <td><%= new Date(evento.data).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></td>
+                <td><%= evento.descricao %></td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="2">Nenhum histórico disponível.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel-section form-section">
+      <div class="form-card">
+        <h2>Avançar status</h2>
+        <form method="POST" action="/painel/entregas/<%= entrega.id %>/avancar">
+          <button class="button button-primary" type="submit">Avançar status</button>
+        </form>
+      </div>
+
+      <div class="form-card">
+        <h2>Atribuir motorista</h2>
+        <form method="POST" action="/painel/entregas/<%= entrega.id %>/atribuir" class="form-grid">
+          <label>
+            Motorista Id
+            <input type="number" name="motoristaId" required />
+          </label>
+          <button class="button button-primary" type="submit">Atribuir</button>
+        </form>
+      </div>
+
+      <% if (entrega.status !== 'ENTREGUE' && entrega.status !== 'CANCELADA') { %>
+      <div class="form-card">
+        <h2>Cancelar entrega</h2>
+        <form method="POST" action="/painel/entregas/<%= entrega.id %>/cancelar">
+          <button class="button button-danger" type="submit" onclick="return confirm('Tem certeza que deseja cancelar esta entrega?')">Cancelar entrega</button>
+        </form>
+      </div>
+      <% } %>
+    </section>
+  </div>
+</body>
+</html>

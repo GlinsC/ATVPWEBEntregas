@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Motoristas</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <div>
+        <h1>Painel de Motoristas</h1>
+        <p class="subtitle">Gerencie motoristas, filtre por status e crie novos cadastros.</p>
+      </div>
+      <nav class="page-nav">
+        <a href="/painel/entregas">Entregas</a>
+        <a href="/painel/motorista">Motoristas</a>
+      </nav>
+    </header>
+
+    <% if (errorMessage) { %>
+      <div class="alert alert-error"><%= errorMessage %></div>
+    <% } %>
+    <% if (successMessage) { %>
+      <div class="alert alert-success"><%= successMessage %></div>
+    <% } %>
+
+    <section class="panel-section form-section">
+      <div class="form-card">
+        <h2>Filtrar motoristas</h2>
+        <form method="GET" action="/painel/motorista" class="form-grid">
+          <label>
+            Status
+            <select name="status">
+              <option value="">Todos</option>
+              <% statusOptions.forEach(option => { %>
+                <option value="<%= option %>" <%= selectedStatus === option ? 'selected' : '' %>><%= option %></option>
+              <% }) %>
+            </select>
+          </label>
+          <button class="button" type="submit">Filtrar</button>
+        </form>
+      </div>
+
+      <div class="form-card">
+        <h2>Criar novo motorista</h2>
+        <form method="POST" action="/painel/motorista" class="form-grid">
+          <label>
+            Nome
+            <input type="text" name="nome" value="<%= formData.nome || '' %>" required />
+          </label>
+          <label>
+            CPF
+            <input type="text" name="cpf" value="<%= formData.cpf || '' %>" required />
+          </label>
+          <label>
+            Placa do Veículo
+            <input type="text" name="placaVeiculo" value="<%= formData.placaVeiculo || '' %>" required />
+          </label>
+          <button class="button button-primary" type="submit">Criar motorista</button>
+        </form>
+      </div>
+    </section>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>Placa</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (motoristas && motoristas.length > 0) { %>
+          <% motoristas.forEach(motorista => { %>
+            <tr>
+              <td><%= motorista.id %></td>
+              <td><%= motorista.nome %></td>
+              <td><%= motorista.cpf %></td>
+              <td><%= motorista.placaVeiculo %></td>
+              <td><%= motorista.status %></td>
+              <td>
+                <a class="button button-small" href="/painel/motorista/<%= motorista.id %>">Detalhes</a>
+                <form method="POST" action="/painel/motorista/<%= motorista.id %>/status" style="display: inline;">
+                  <button class="button button-small <%= motorista.status === 'ATIVO' ? 'button-danger' : 'button-primary' %>" type="submit">
+                    <%= motorista.status === 'ATIVO' ? 'Desativar' : 'Ativar' %>
+                  </button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="6">Nenhum motorista encontrado.</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

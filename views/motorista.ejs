@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel de Motoristas</title>
+  <title>Motorista <%= motorista.id %></title>
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
   <div class="container">
     <header class="page-header">
       <div>
-        <h1>Painel de Motoristas</h1>
-        <p class="subtitle">Dados de motoristas e entregas distribuídas separadamente.</p>
+        <h1>Motorista #<%= motorista.id %></h1>
+        <p class="subtitle">Detalhes do motorista e entregas atribuídas.</p>
       </div>
       <nav class="page-nav">
         <a href="/painel/entregas">Entregas</a>
@@ -19,51 +19,37 @@
       </nav>
     </header>
 
+    <% if (errorMessage) { %>
+      <div class="alert alert-error"><%= errorMessage %></div>
+    <% } %>
+    <% if (successMessage) { %>
+      <div class="alert alert-success"><%= successMessage %></div>
+    <% } %>
+
     <section class="panel-section">
-      <h2>Motoristas</h2>
+      <h2>Informações do motorista</h2>
       <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>CPF</th>
-            <th>Placa</th>
-            <th>Status</th>
-            <th>Entregas</th>
-          </tr>
-        </thead>
         <tbody>
-          <% if (motoristas && motoristas.length > 0) { %>
-            <% motoristas.forEach(motorista => { %>
-              <tr>
-                <td><%= motorista.id %></td>
-                <td><%= motorista.nome %></td>
-                <td><%= motorista.cpf %></td>
-                <td><%= motorista.placaVeiculo %></td>
-                <td><%= motorista.status %></td>
-                <td><%= motorista.entregas ? motorista.entregas.length : 0 %></td>
-              </tr>
-            <% }) %>
-          <% } else { %>
-            <tr>
-              <td colspan="6">Nenhum motorista cadastrado.</td>
-            </tr>
-          <% } %>
+          <tr><th>ID</th><td><%= motorista.id %></td></tr>
+          <tr><th>Nome</th><td><%= motorista.nome %></td></tr>
+          <tr><th>CPF</th><td><%= motorista.cpf %></td></tr>
+          <tr><th>Placa do Veículo</th><td><%= motorista.placaVeiculo %></td></tr>
+          <tr><th>Status</th><td><%= motorista.status %></td></tr>
         </tbody>
       </table>
     </section>
 
     <section class="panel-section">
-      <h2>Entregas</h2>
+      <h2>Entregas atribuídas</h2>
       <table>
         <thead>
           <tr>
             <th>ID</th>
             <th>Descrição</th>
-            <th>Status</th>
-            <th>Motorista</th>
             <th>Origem</th>
             <th>Destino</th>
+            <th>Status</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -72,15 +58,17 @@
               <tr>
                 <td><%= entrega.id %></td>
                 <td><%= entrega.descricao %></td>
-                <td><%= entrega.status %></td>
-                <td><%= entrega.motorista ? entrega.motorista.nome : "Sem motorista" %></td>
                 <td><%= entrega.origem %></td>
                 <td><%= entrega.destino %></td>
+                <td><%= entrega.status %></td>
+                <td>
+                  <a class="button button-small" href="/painel/entregas/<%= entrega.id %>">Ver entrega</a>
+                </td>
               </tr>
             <% }) %>
           <% } else { %>
             <tr>
-              <td colspan="6">Nenhuma entrega encontrada.</td>
+              <td colspan="6">Nenhuma entrega atribuída.</td>
             </tr>
           <% } %>
         </tbody>

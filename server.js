@@ -19,6 +19,7 @@ const { motoristasRoutes, painelMotoristaRoutes } = require("./routes/MotoristaR
 
 const server = express();
 server.use(express.json());
+server.use(express.urlencoded({ extended: true }));
 server.use(express.static(path.join(__dirname, "public")));
 server.set("view engine", "ejs");
 server.set("views", path.join(__dirname, "views"));
