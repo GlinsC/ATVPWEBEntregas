@@ -63,6 +63,33 @@ test("GET /painel/entregas aceita token via cookie para navegação HTML", async
   assert.match(response.text, /Painel de Entregas/i);
 });
 
+test("POST /painel/motorista redireciona com erro visível para operador", async () => {
+  const senhaHash = await bcrypt.hash("123456", 10);
+  const operador = await prisma.user.create({
+    data: {
+      nome: "Operador Painel",
+      email: `painel+${Date.now()}@mail.com`,
+      senha: senhaHash,
+      papel: "OPERADOR"
+    }
+  });
+
+  createdEmails.push(operador.email);
+
+  const loginResponse = await request(app)
+    .post("/api/auth/login")
+    .send({ email: operador.email, senha: "123456" });
+
+  const response = await request(app)
+    .post("/painel/motorista")
+    .set("Cookie", `token=${encodeURIComponent(loginResponse.body.token)}`)
+    .type("form")
+    .send({ nome: "Motorista Bloqueado", cpf: "00000000000", placaVeiculo: "AAA0000" });
+
+  assert.equal(response.status, 302);
+  assert.match(response.headers.location, /error=/i);
+});
+
 test("PATCH /api/usuarios/:id/papel exige autorização de GESTOR", async () => {
   const senhaHash = await bcrypt.hash("123456", 10);
   const operador = await prisma.user.create({
@@ -94,6 +121,7 @@ test("PATCH /api/usuarios/:id/papel exige autorização de GESTOR", async () => 
   const patchResponse = await request(app)
     .patch(`/api/usuarios/${gestor.id}/papel`)
     .set("Authorization", `Bearer ${loginResponse.body.token}`)
+    .set("Accept", "application/json")
     .send({ papel: "OPERADOR" });
 
   assert.equal(patchResponse.status, 403);
