@@ -44,6 +44,7 @@ class EntregasRepositoryPrisma {
       where,
       include: {
         motorista: true,
+        criador: true,
         eventos: { orderBy: { data: "asc" } }
       },
       skip,
@@ -66,6 +67,7 @@ class EntregasRepositoryPrisma {
       where: { id: parseInt(id) },
       include: {
         motorista: true,
+        criador: true,
         eventos: { orderBy: { data: "asc" } }
       }
     });
@@ -79,9 +81,10 @@ class EntregasRepositoryPrisma {
         origem: dados.origem,
         destino: dados.destino,
         status: dados.status || "CRIADA",
-        motoristaId: dados.motoristaId || null
+        motoristaId: dados.motoristaId || null,
+        criadorId: dados.criadorId || null
       },
-      include: { motorista: true, eventos: true }
+      include: { motorista: true, criador: true, eventos: true }
     });
   }
 

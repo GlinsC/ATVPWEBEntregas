@@ -6,7 +6,7 @@ class EntregasService {
     this.motoristasRepository = motoristasRepository;
   }
 
-  async criarEntrega({ descricao, origem, destino }) {
+  async criarEntrega({ descricao, origem, destino, criadorId }) {
     if (origem === destino) {
       throw new Error("Origem e destino não podem ser iguais");
     }
@@ -29,12 +29,12 @@ class EntregasService {
     }
 
     const novaEntrega = {
-      id: null,
       descricao,
       origem,
       destino,
       status: STATUS.CRIADA,
-      motoristaId: null
+      motoristaId: null,
+      criadorId
     };
 
     const entregaCriada = await this.entregasRepository.criar(novaEntrega);

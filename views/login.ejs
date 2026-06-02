@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Entregas</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="container auth-container">
+    <section class="auth-card">
+      <h1>Entrar no sistema</h1>
+      <p class="subtitle">Faça login para acessar entregas, motoristas e relatórios.</p>
+
+      <% if (errorMessage) { %>
+        <div class="alert alert-error"><%= errorMessage %></div>
+      <% } %>
+      <% if (successMessage) { %>
+        <div class="alert alert-success"><%= successMessage %></div>
+      <% } %>
+
+      <form onsubmit="return handleLogin(event)" class="form-grid">
+        <label>
+          E-mail
+          <input type="email" name="email" value="<%= formData.email || '' %>" required />
+        </label>
+        <label>
+          Senha
+          <input type="password" name="senha" required />
+        </label>
+        <button class="button button-primary" type="submit">Entrar</button>
+      </form>
+
+      <p class="auth-link">Não tem conta? <a href="/registrar">Criar cadastro</a></p>
+    </section>
+  </div>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

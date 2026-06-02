@@ -39,7 +39,10 @@ class EntregasController {
 
   criar = async (req, res) => {
     try {
-      const entrega = await this.service.criarEntrega(req.body);
+      const entrega = await this.service.criarEntrega({
+        ...req.body,
+        criadorId: req.usuario.id
+      });
       if (this.isPainelRequest(req)) {
         return res.redirect("/painel/entregas?success=Entrega criada com sucesso");
       }

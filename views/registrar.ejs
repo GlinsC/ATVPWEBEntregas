@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro - Entregas</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <div class="container auth-container">
+    <section class="auth-card">
+      <h1>Criar conta</h1>
+      <p class="subtitle">Cadastre um usuário com nome, e-mail e senha para acessar o sistema.</p>
+
+      <% if (errorMessage) { %>
+        <div class="alert alert-error"><%= errorMessage %></div>
+      <% } %>
+      <% if (successMessage) { %>
+        <div class="alert alert-success"><%= successMessage %></div>
+      <% } %>
+
+      <form onsubmit="return handleRegister(event)" class="form-grid">
+        <label>
+          Nome
+          <input type="text" name="nome" value="<%= formData.nome || '' %>" required />
+        </label>
+        <label>
+          E-mail
+          <input type="email" name="email" value="<%= formData.email || '' %>" required />
+        </label>
+        <label>
+          Senha
+          <input type="password" name="senha" required />
+        </label>
+        <button class="button button-primary" type="submit">Criar conta</button>
+      </form>
+
+      <p class="auth-link">Já possui conta? <a href="/login">Fazer login</a></p>
+    </section>
+  </div>
+  <script src="/js/auth.js"></script>
+</body>
+</html>

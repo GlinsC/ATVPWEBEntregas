@@ -33,9 +33,13 @@ model Entrega {
   destino       String
   status        String    @default("CRIADA")  // CRIADA, EM_TRANSITO, ENTREGUE, CANCELADA
   motoristaId   Int?
+  criadorId     Int?
   
   // Relação N:1 com Motorista
   motorista     Motorista? @relation(fields: [motoristaId], references: [id])
+  
+  // Relação N:1 com User criador
+  criador       User?      @relation("CriadorEntrega", fields: [criadorId], references: [id])
   
   // Relação 1:N com EventoEntrega (com cascade delete)
   eventos       EventoEntrega[]
@@ -56,4 +60,15 @@ model EventoEntrega {
   
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  nome            String
+  email           String    @unique
+  senha           String
+  papel           String    @default("OPERADOR")
+  entregasCriadas Entrega[] @relation("CriadorEntrega")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }

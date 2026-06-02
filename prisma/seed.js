@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
 
 async function main() {
@@ -8,8 +9,20 @@ async function main() {
   await prisma.eventoEntrega.deleteMany();
   await prisma.entrega.deleteMany();
   await prisma.motorista.deleteMany();
+  await prisma.user.deleteMany();
 
   console.log("🧹 Banco limpo");
+
+  const senhaPadrao = await bcrypt.hash("123456", 10);
+
+  await prisma.user.createMany({
+    data: [
+      { nome: "Gestor Demo", email: "gestor@demo.com", senha: senhaPadrao, papel: "GESTOR" },
+      { nome: "Operador Demo", email: "operador@demo.com", senha: senhaPadrao, papel: "OPERADOR" }
+    ]
+  });
+
+  console.log("✓ Usuários de exemplo criados");
 
   // Criar motoristas
   const motorista1 = await prisma.motorista.create({
