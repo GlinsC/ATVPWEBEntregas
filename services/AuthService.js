@@ -22,13 +22,19 @@ class AuthService {
       papel: usuario.papel
     };
 
-    const token = jwt.sign(tokenPayload, this.jwtSecret, {
+    const accessToken = jwt.sign(tokenPayload, this.jwtSecret, {
       expiresIn: this.jwtExpiresIn
+    });
+
+    const refreshToken = jwt.sign(tokenPayload, this.jwtSecret, {
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d"
     });
 
     return {
       mensagem: "Login realizado com sucesso",
-      token,
+      accessToken,
+      refreshToken,
+      token: accessToken,
       usuario: tokenPayload
     };
   }

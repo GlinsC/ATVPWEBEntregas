@@ -15,11 +15,15 @@ function obterToken(req) {
   return cookie ? decodeURIComponent(cookie.slice("token=".length)) : null;
 }
 
+function isApiRequest(req) {
+  return req.originalUrl.startsWith('/api') || req.baseUrl.startsWith('/api');
+}
+
 function autenticar(req, res, next) {
   const token = obterToken(req);
 
   if (!token) {
-    if (req.accepts('html')) {
+    if (!isApiRequest(req) && req.accepts('html')) {
       return res.redirect('/login?error=' + encodeURIComponent('Token não fornecido'));
     }
 
@@ -35,13 +39,13 @@ function autenticar(req, res, next) {
     return next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      if (req.accepts('html')) {
+      if (!isApiRequest(req) && req.accepts('html')) {
         return res.redirect('/login?error=' + encodeURIComponent('Token expirado'));
       }
       return res.status(401).json({ erro: 'Token expirado' });
     }
 
-    if (req.accepts('html')) {
+    if (!isApiRequest(req) && req.accepts('html')) {
       return res.redirect('/login?error=' + encodeURIComponent('Token inválido'));
     }
 

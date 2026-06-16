@@ -1,0 +1,99 @@
+ATVENTREGAS - Instruções de Testes
+
+1. Visão geral
+
+Este projeto usa Jest para testes unitários e de integração. Os testes estão organizados em:
+- tests/unit/ -> testes unitários de serviços
+- tests/integration/ -> testes de integração de rotas
+
+2. Arquivo de ambiente para testes
+
+O ambiente de testes usa o arquivo:
+- tests/.env.test
+
+Esse arquivo carrega variáveis como DATABASE_URL e JWT_SECRET apenas durante os testes.
+
+3. Como executar os testes
+
+No diretório do projeto, execute:
+
+npm test
+
+Esse comando usa a configuração de Jest definida em tests/jest.config.js.
+
+4. Execução de um teste específico
+
+Para rodar apenas o teste de integração de autenticação:
+
+npx jest --config tests/jest.config.js tests/integration/auth.routes.test.js --runInBand
+
+Para rodar apenas o teste de integração de segurança de entregas:
+
+npx jest --config tests/jest.config.js tests/integration/entregas.routes.test.js --runInBand
+
+5. O que o teste faz
+
+Os testes de integração criam dados no banco de testes e limpam as tabelas antes de cada caso.
+
+5.1 Auth - testes de integração
+
+Cenários cobertos:
+- POST /api/auth/registrar com dados válidos
+  - Esperado: status 201
+  - Retorno: JSON com id, nome, email, createdAt
+  - Não deve retornar campo senha
+
+- POST /api/auth/registrar com senha menor que 8
+  - Esperado: status 400
+  - Retorno: { erro: "Senha deve ter pelo menos 8 caracteres" }
+
+- POST /api/auth/registrar com e-mail já cadastrado
+  - Esperado: status 409
+  - Retorno: { erro: "Email já cadastrado" }
+
+- POST /api/auth/login com credenciais válidas
+  - Esperado: status 200
+  - Retorno: JSON com accessToken, refreshToken e objeto usuario
+
+- POST /api/auth/login com senha incorreta
+  - Esperado: status 401
+  - Retorno: { erro: "Credenciais inválidas" }
+
+- POST /api/auth/login com e-mail inexistente
+  - Esperado: status 401
+  - Retorno: { erro: "Credenciais inválidas" }
+
+5.2 Entregas - testes de segurança
+
+Cenários cobertos:
+- Requisição sem token em rota protegida
+  - Esperado: status 401
+
+- Requisição com token assinado inválido
+  - Esperado: status 401
+
+- Requisição com token expirado
+  - Esperado: status 401
+  - Retorno: mensagem contendo "expirado"
+
+- Usuário com papel OPERADOR acessando rota exclusiva para GESTOR
+  - Esperado: status 403
+
+- Usuário OPERADOR tentando cancelar entrega em rota exclusiva de GESTOR
+  - Esperado: status 403
+
+6. Observações importantes
+
+- O banco utilizado nos testes é SQLite em ambiente de teste.
+- Os testes de integração removem dados das tabelas antes de cada execução para manter isolamento.
+- Se fizer alterações nas rotas ou nos middlewares de autenticação, atualize os testes para refletir esses comportamentos.
+
+7. Uso rápido
+
+npm test
+
+ou
+
+npx jest --config tests/jest.config.js tests/integration/auth.routes.test.js --runInBand
+
+npx jest --config tests/jest.config.js tests/integration/entregas.routes.test.js --runInBand

@@ -1,3 +1,7 @@
+function isApiRequest(req) {
+  return req.originalUrl.startsWith('/api') || req.baseUrl.startsWith('/api');
+}
+
 function autorizar(...papeis) {
   return (req, res, next) => {
     const usuarioPapel = req.usuario && req.usuario.papel;
@@ -5,7 +9,7 @@ function autorizar(...papeis) {
     if (!papeis.includes(usuarioPapel)) {
       const mensagem = "Acesso negado. Você precisa de permissão de gestor.";
 
-      if (req.accepts("html")) {
+      if (!isApiRequest(req) && req.accepts("html")) {
         const referer = req.get("referer");
         const fallbackPath = "/painel/entregas";
         const redirectPath = referer

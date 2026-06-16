@@ -12,6 +12,12 @@ class UserService {
       throw error;
     }
 
+    if (senha.length < 8) {
+      const error = new Error("Senha deve ter pelo menos 8 caracteres");
+      error.status = 400;
+      throw error;
+    }
+
     const existente = await this.userRepository.buscarPorEmail(email);
     if (existente) {
       const error = new Error("Email já cadastrado");
@@ -36,14 +42,14 @@ class UserService {
 
     const usuario = await this.userRepository.buscarPorEmail(email);
     if (!usuario) {
-      const error = new Error("Email ou senha inválidos");
+      const error = new Error("Credenciais inválidas");
       error.status = 401;
       throw error;
     }
 
     const valido = await bcrypt.compare(senha, usuario.senha);
     if (!valido) {
-      const error = new Error("Email ou senha inválidos");
+      const error = new Error("Credenciais inválidas");
       error.status = 401;
       throw error;
     }
