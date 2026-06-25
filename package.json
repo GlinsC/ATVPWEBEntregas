@@ -10,7 +10,8 @@
     "test": "jest --config tests/jest.config.js --runInBand",
     "test:watch": "jest --config tests/jest.config.js --watch",
     "test:coverage": "jest --config tests/jest.config.js --coverage --runInBand",
-    "start": "node src/server.js",
+    "start": "node server.js",
+    "test:e2e": "npx playwright test --config tests/e2e/playwright.config.js",
     "migrate": "prisma migrate dev",
     "seed": "node prisma/seed.js",
     "studio": "prisma studio"

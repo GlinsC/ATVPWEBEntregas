@@ -68,7 +68,10 @@ app.use("/api", entregasRoutes(entregasController));
 app.use("/api", motoristasRoutes(motoristasController));
 app.use("/", painelEntregasRoutes(entregasController));
 app.use("/", painelMotoristaRoutes(motoristasController));
-
+app.get('/logout', (req, res) => {
+  res.clearCookie('token', { path: '/' });
+  res.redirect('/login');
+});
 app.get("/", (req, res) => {
   res.redirect("/login");
 });

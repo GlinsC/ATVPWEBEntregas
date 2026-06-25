@@ -13,22 +13,22 @@
       <p class="subtitle">Faça login para acessar entregas, motoristas e relatórios.</p>
 
       <% if (errorMessage) { %>
-        <div class="alert alert-error"><%= errorMessage %></div>
+        <div class="alert alert-error" data-testid="alerta-erro"><%= errorMessage %></div>
       <% } %>
       <% if (successMessage) { %>
-        <div class="alert alert-success"><%= successMessage %></div>
+        <div class="alert alert-success" data-testid="alerta-success"><%= successMessage %></div>
       <% } %>
 
       <form onsubmit="return handleLogin(event)" class="form-grid">
         <label>
           E-mail
-          <input type="email" name="email" value="<%= formData.email || '' %>" required />
+          <input data-testid="input-email" type="email" name="email" value="<%= formData.email || '' %>" required />
         </label>
         <label>
           Senha
-          <input type="password" name="senha" required />
+          <input data-testid="input-senha" type="password" name="senha" required />
         </label>
-        <button class="button button-primary" type="submit">Entrar</button>
+        <button data-testid="btn-login" class="button button-primary" type="submit">Entrar</button>
       </form>
 
       <p class="auth-link">Não tem conta? <a href="/registrar">Criar cadastro</a></p>

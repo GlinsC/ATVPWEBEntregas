@@ -1,11 +1,23 @@
-require('dotenv').config({ path: 'tests/.env.test' });
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env.test') });
 
 module.exports = {
-  rootDir: '.',
+  rootDir: path.resolve(__dirname, '..'),
   testEnvironment: 'node',
-  testMatch: ['**/*.test.js'],
-  collectCoverageFrom: ['src/controllers/**/*.js', 'src/services/**/*.js', 'src/middlewares/**/*.js', 'src/repositories/**/*.js'],
-  coverageDirectory: 'coverage',
-  setupFiles: ['<rootDir>/setupEnv.js'],
+  testMatch: ['<rootDir>/tests/unit/**/*.test.js', '<rootDir>/tests/integration/**/*.test.js'],
+  collectCoverageFrom: ['controllers/**/*.js', 'services/**/*.js', 'middlewares/**/*.js', 'repositories/**/*.js', 'utils/**/*.js'],
+  coverageThreshold: {
+    'services/': {
+      statements: 80
+    },
+    'middlewares/': {
+      statements: 85
+    },
+    'utils/': {
+      statements: 75
+    }
+  },
+  coverageDirectory: '<rootDir>/coverage',
+  setupFiles: ['<rootDir>/tests/setupEnv.js'],
   clearMocks: true,
 };
